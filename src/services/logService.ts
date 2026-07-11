@@ -8,6 +8,8 @@ export const saveMealLog = async (
   mealName: string,
   items: MenuItemWithQty[]
 ) => {
+  // ignoreDuplicates: only INSERT new items, never UPDATE existing ones —
+  // updates would need a separate RLS policy and menu data rarely changes.
   const { error: menuError } = await supabase.from('menu_items').upsert(
     items.map((item) => ({
       id: item.id,
@@ -17,7 +19,7 @@ export const saveMealLog = async (
       fat_g: item.fat_g,
       carbs_g: item.carbs_g,
     })),
-    { onConflict: 'id' }
+    { onConflict: 'id', ignoreDuplicates: true }
   );
 
   if (menuError) {
@@ -42,6 +44,18 @@ export const saveMealLog = async (
 
   const { error: itemsError } = await supabase.from('meal_log_items').insert(logItems);
   return { data: log, error: itemsError };
+};
+
+export const deleteMealLog = async (logId: string) => {
+  const { error: itemsError } = await supabase
+    .from('meal_log_items')
+    .delete()
+    .eq('meal_log_id', logId);
+  if (itemsError) {
+    return { error: itemsError };
+  }
+  const { error } = await supabase.from('meal_logs').delete().eq('id', logId);
+  return { error };
 };
 
 const mapLog = (row: any): MealLog => {

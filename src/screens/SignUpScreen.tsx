@@ -14,6 +14,7 @@ export const SignUpScreen: React.FC<Props> = ({ navigation }) => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [pendingEmail, setPendingEmail] = useState<string | null>(null);
 
   const handleSignUp = async () => {
     if (!name || !email || !password) {
@@ -22,12 +23,35 @@ export const SignUpScreen: React.FC<Props> = ({ navigation }) => {
     }
     setLoading(true);
     setError(null);
-    const { error: authError } = await signUpWithEmail(email.trim(), password, name.trim());
+    const { data, error: authError } = await signUpWithEmail(email.trim(), password, name.trim());
     if (authError) {
       setError(authError.message);
+    } else if (!data.session) {
+      // No session means email confirmation is required before signing in.
+      setPendingEmail(email.trim());
     }
     setLoading(false);
   };
+
+  if (pendingEmail) {
+    return (
+      <Screen>
+        <View style={styles.confirmContainer}>
+          <Text style={styles.confirmEmoji}>📬</Text>
+          <Text style={styles.title}>Check your email</Text>
+          <Text style={styles.confirmBody}>
+            We sent a confirmation link to{'\n'}
+            <Text style={styles.confirmEmail}>{pendingEmail}</Text>
+          </Text>
+          <Text style={styles.confirmHint}>
+            Click the link in that email to verify your account, then come back and sign in. Don’t
+            forget to check your spam folder.
+          </Text>
+        </View>
+        <Button label="Go to Sign In" onPress={() => navigation.navigate('Login')} />
+      </Screen>
+    );
+  }
 
   return (
     <Screen>
@@ -116,5 +140,29 @@ const styles = StyleSheet.create({
   error: {
     ...typography.caption,
     color: colors.error,
+  },
+  confirmContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: spacing.md,
+    paddingHorizontal: spacing.lg,
+  },
+  confirmEmoji: {
+    fontSize: 56,
+  },
+  confirmBody: {
+    ...typography.body,
+    color: colors.text,
+    textAlign: 'center',
+  },
+  confirmEmail: {
+    fontWeight: '600',
+    color: colors.primary,
+  },
+  confirmHint: {
+    ...typography.caption,
+    color: colors.textMuted,
+    textAlign: 'center',
   },
 });

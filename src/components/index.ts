@@ -6,3 +6,4 @@ export { ListRow } from './ListRow';
 export { AppModal } from './AppModal';
 export { Screen } from './Screen';
 export { OnboardingStep } from './OnboardingStep';
+export { BullMark } from './BullMark';

@@ -46,10 +46,10 @@ const ProfileStack = createNativeStackNavigator<ProfileStackParamList>();
 export type DiningStackParamList = {
   Dashboard: undefined;
   SelectDiningHall: undefined;
-  DiningHallMenu: { hall: 'hub' | 'juniper' | 'argos' };
+  DiningHallMenu: { hallId: string; hallName: string };
   MealDetail: {
-    hall: 'hub' | 'juniper' | 'argos';
-    period: 'breakfast' | 'lunch' | 'dinner';
+    hallName: string;
+    periodName: string;
     items: { id: string; name: string; calories: number; protein_g: number; fat_g: number; carbs_g: number; quantity: number }[];
   };
 };
@@ -84,30 +84,40 @@ const AuthStackNavigator = () => (
   </AuthStack.Navigator>
 );
 
+// Back-navigation header used on every screen below a tab root.
+const subScreenOptions = {
+  headerShown: true,
+  headerTitle: '',
+  headerTintColor: colors.primary,
+  headerShadowVisible: false,
+  headerStyle: { backgroundColor: colors.background },
+  headerBackTitleVisible: false,
+} as const;
+
 const DiningStackNavigator = () => (
   <DiningStack.Navigator screenOptions={{ headerShown: false }}>
     <DiningStack.Screen name="Dashboard" component={DashboardScreen} />
-    <DiningStack.Screen name="SelectDiningHall" component={SelectDiningHallScreen} />
-    <DiningStack.Screen name="DiningHallMenu" component={DiningHallMenuScreen} />
-    <DiningStack.Screen name="MealDetail" component={MealDetailScreen} />
+    <DiningStack.Screen name="SelectDiningHall" component={SelectDiningHallScreen} options={subScreenOptions} />
+    <DiningStack.Screen name="DiningHallMenu" component={DiningHallMenuScreen} options={subScreenOptions} />
+    <DiningStack.Screen name="MealDetail" component={MealDetailScreen} options={subScreenOptions} />
   </DiningStack.Navigator>
 );
 
 const HistoryStackNavigator = () => (
   <HistoryStack.Navigator screenOptions={{ headerShown: false }}>
     <HistoryStack.Screen name="History" component={HistoryScreen} />
-    <HistoryStack.Screen name="HistoryDetail" component={HistoryDetailScreen} />
+    <HistoryStack.Screen name="HistoryDetail" component={HistoryDetailScreen} options={subScreenOptions} />
   </HistoryStack.Navigator>
 );
 
 const ProfileStackNavigator = () => (
   <ProfileStack.Navigator screenOptions={{ headerShown: false }}>
     <ProfileStack.Screen name="Profile" component={ProfileScreen} />
-    <ProfileStack.Screen name="Me" component={MeScreen} />
-    <ProfileStack.Screen name="CalorieIntake" component={CalorieIntakeScreen} />
-    <ProfileStack.Screen name="WeightUnit" component={WeightUnitScreen} />
-    <ProfileStack.Screen name="ContactUs" component={ContactUsScreen} />
-    <ProfileStack.Screen name="About" component={AboutScreen} />
+    <ProfileStack.Screen name="Me" component={MeScreen} options={subScreenOptions} />
+    <ProfileStack.Screen name="CalorieIntake" component={CalorieIntakeScreen} options={subScreenOptions} />
+    <ProfileStack.Screen name="WeightUnit" component={WeightUnitScreen} options={subScreenOptions} />
+    <ProfileStack.Screen name="ContactUs" component={ContactUsScreen} options={subScreenOptions} />
+    <ProfileStack.Screen name="About" component={AboutScreen} options={subScreenOptions} />
   </ProfileStack.Navigator>
 );
 

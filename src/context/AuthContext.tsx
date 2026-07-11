@@ -44,7 +44,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         fat_target_g: null,
         carbs_target_g: null,
       });
-      setProfile(created ?? null);
+      setProfile((created as Profile | null) ?? null);
       return;
     }
     setProfile(data as Profile);

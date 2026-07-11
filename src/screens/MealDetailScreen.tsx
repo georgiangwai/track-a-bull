@@ -12,11 +12,12 @@ import { DiningStackParamList } from '../app/navigation';
 type Props = NativeStackScreenProps<DiningStackParamList, 'MealDetail'>;
 
 export const MealDetailScreen: React.FC<Props> = ({ navigation, route }) => {
-  const { items, period } = route.params;
+  const { items, periodName, hallName } = route.params;
   const { session } = useAuth();
   const queryClient = useQueryClient();
   const [saving, setSaving] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const totals = useMemo(() => {
     return items.reduce(
@@ -33,11 +34,14 @@ export const MealDetailScreen: React.FC<Props> = ({ navigation, route }) => {
   const handleSave = async () => {
     if (!session?.user) return;
     setSaving(true);
+    setError(null);
     const date = formatDate(new Date());
-    const mealName = period.charAt(0).toUpperCase() + period.slice(1);
-    const { error } = await saveMealLog(session.user.id, date, mealName, items);
+    const mealName = `${periodName} · ${hallName}`;
+    const { error: saveError } = await saveMealLog(session.user.id, date, mealName, items);
     setSaving(false);
-    if (!error) {
+    if (saveError) {
+      setError(saveError.message ?? 'Could not save your meal. Please try again.');
+    } else {
       await queryClient.invalidateQueries({ queryKey: ['mealLogs'] });
       setShowModal(true);
     }
@@ -45,7 +49,8 @@ export const MealDetailScreen: React.FC<Props> = ({ navigation, route }) => {
 
   return (
     <Screen>
-      <Text style={styles.title}>Meal #{period === 'breakfast' ? '1' : period === 'lunch' ? '2' : '3'}</Text>
+      <Text style={styles.title}>{periodName}</Text>
+      <Text style={styles.subtitle}>{hallName}</Text>
       <View style={styles.summary}>
         <View>
           <Text style={styles.summaryValue}>{Math.round(totals.calories)}</Text>
@@ -65,6 +70,7 @@ export const MealDetailScreen: React.FC<Props> = ({ navigation, route }) => {
         </View>
       </View>
       <FlatList
+        style={styles.listFill}
         data={items}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
@@ -76,6 +82,7 @@ export const MealDetailScreen: React.FC<Props> = ({ navigation, route }) => {
           </View>
         )}
       />
+      {error ? <Text style={styles.error}>{error}</Text> : null}
       <Button label="Save" onPress={handleSave} disabled={saving} />
       {saving && <ActivityIndicator color={colors.primary} style={styles.loading} />}
       <AppModal
@@ -96,6 +103,11 @@ const styles = StyleSheet.create({
     ...typography.header,
     color: colors.text,
     textAlign: 'center',
+  },
+  subtitle: {
+    ...typography.body,
+    color: colors.textMuted,
+    textAlign: 'center',
     marginBottom: spacing.lg,
   },
   summary: {
@@ -112,6 +124,9 @@ const styles = StyleSheet.create({
     ...typography.caption,
     color: colors.textMuted,
     textAlign: 'center',
+  },
+  listFill: {
+    flex: 1,
   },
   row: {
     borderBottomWidth: 1,
@@ -130,5 +145,11 @@ const styles = StyleSheet.create({
   },
   loading: {
     marginTop: spacing.sm,
+  },
+  error: {
+    ...typography.caption,
+    color: colors.error,
+    textAlign: 'center',
+    marginBottom: spacing.sm,
   },
 });

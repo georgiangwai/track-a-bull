@@ -1,7 +1,9 @@
-import React from 'react';
-import { StyleSheet, Text, View, ViewStyle } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { Animated, Easing, StyleSheet, Text, View, ViewStyle } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
 import { colors, typography } from '../theme';
+
+const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
 type CalorieRingProps = {
   size?: number;
@@ -21,7 +23,22 @@ export const CalorieRing: React.FC<CalorieRingProps> = ({
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
   const progress = Math.min(value / max, 1);
-  const dashOffset = circumference * (1 - progress);
+  const progressAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.timing(progressAnim, {
+      toValue: progress,
+      duration: 800,
+      easing: Easing.out(Easing.cubic),
+      // SVG props can't use the native driver
+      useNativeDriver: false,
+    }).start();
+  }, [progress, progressAnim]);
+
+  const dashOffset = progressAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: [circumference, 0],
+  });
 
   return (
     <View style={[styles.container, style]}>
@@ -34,11 +51,11 @@ export const CalorieRing: React.FC<CalorieRingProps> = ({
           strokeWidth={strokeWidth}
           fill="none"
         />
-        <Circle
+        <AnimatedCircle
           cx={size / 2}
           cy={size / 2}
           r={radius}
-          stroke={colors.primary}
+          stroke={progress >= 1 ? colors.accentDark : colors.primary}
           strokeWidth={strokeWidth}
           strokeDasharray={`${circumference} ${circumference}`}
           strokeDashoffset={dashOffset}

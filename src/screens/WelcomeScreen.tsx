@@ -1,7 +1,7 @@
 import React from 'react';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { Button, Screen } from '../components';
+import { BullMark, Button, Screen } from '../components';
 import { colors, spacing, typography } from '../theme';
 import { AuthStackParamList } from '../app/navigation';
 
@@ -11,9 +11,11 @@ export const WelcomeScreen: React.FC<Props> = ({ navigation }) => {
   return (
     <Screen style={styles.container}>
       <View style={styles.center}>
-        <Image source={require('../../assets/icon.png')} style={styles.logo} />
-        <Text style={styles.title}>Welcome</Text>
-        <Text style={styles.subtitle}>Start or sign in to your account</Text>
+        <BullMark size={120} />
+        <Text style={styles.title}>
+          Track-A-<Text style={styles.titleAccent}>Bull</Text>
+        </Text>
+        <Text style={styles.subtitle}>Fuel up, Bulls. Know what’s on your plate.</Text>
       </View>
       <View style={styles.actions}>
         <Button label="Start" onPress={() => navigation.navigate('SignUp')} />
@@ -34,22 +36,21 @@ const styles = StyleSheet.create({
   },
   center: {
     alignItems: 'center',
-    marginTop: spacing.xl,
-  },
-  logo: {
-    width: 96,
-    height: 96,
-    marginBottom: spacing.lg,
-    resizeMode: 'contain',
+    marginTop: spacing.xl * 2,
+    gap: spacing.sm,
   },
   title: {
     ...typography.header,
-    color: colors.text,
+    color: colors.primary,
+    marginTop: spacing.lg,
+  },
+  titleAccent: {
+    color: colors.accentDark,
   },
   subtitle: {
     ...typography.body,
     color: colors.textMuted,
-    marginTop: spacing.sm,
+    textAlign: 'center',
   },
   actions: {
     gap: spacing.md,

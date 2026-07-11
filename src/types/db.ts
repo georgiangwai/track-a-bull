@@ -25,6 +25,7 @@ export type Database = {
           user_id: string;
         };
         Update: Partial<Database['public']['Tables']['profiles']['Row']>;
+        Relationships: [];
       };
       dining_halls: {
         Row: {
@@ -36,6 +37,7 @@ export type Database = {
           name: string;
         };
         Update: Partial<Database['public']['Tables']['dining_halls']['Row']>;
+        Relationships: [];
       };
       menu_items: {
         Row: {
@@ -47,8 +49,17 @@ export type Database = {
           carbs_g: number;
           updated_at: string | null;
         };
-        Insert: Database['public']['Tables']['menu_items']['Row'];
+        Insert: {
+          id: string;
+          name: string;
+          calories: number;
+          protein_g: number;
+          fat_g: number;
+          carbs_g: number;
+          updated_at?: string | null;
+        };
         Update: Partial<Database['public']['Tables']['menu_items']['Row']>;
+        Relationships: [];
       };
       menu_entries: {
         Row: {
@@ -58,8 +69,15 @@ export type Database = {
           period: string;
           menu_item_id: string;
         };
-        Insert: Database['public']['Tables']['menu_entries']['Row'];
+        Insert: {
+          id?: string;
+          dining_hall_id: string;
+          date: string;
+          period: string;
+          menu_item_id: string;
+        };
         Update: Partial<Database['public']['Tables']['menu_entries']['Row']>;
+        Relationships: [];
       };
       meal_logs: {
         Row: {
@@ -69,8 +87,15 @@ export type Database = {
           meal_name: string;
           created_at: string | null;
         };
-        Insert: Database['public']['Tables']['meal_logs']['Row'];
+        Insert: {
+          id?: string;
+          user_id: string;
+          date: string;
+          meal_name: string;
+          created_at?: string | null;
+        };
         Update: Partial<Database['public']['Tables']['meal_logs']['Row']>;
+        Relationships: [];
       };
       meal_log_items: {
         Row: {
@@ -79,13 +104,19 @@ export type Database = {
           menu_item_id: string;
           quantity: number;
         };
-        Insert: Database['public']['Tables']['meal_log_items']['Row'];
+        Insert: {
+          id?: string;
+          meal_log_id: string;
+          menu_item_id: string;
+          quantity: number;
+        };
         Update: Partial<Database['public']['Tables']['meal_log_items']['Row']>;
+        Relationships: [];
       };
     };
-    Views: Record<string, never>;
-    Functions: Record<string, never>;
-    Enums: Record<string, never>;
-    CompositeTypes: Record<string, never>;
+    Views: { [_ in never]: never };
+    Functions: { [_ in never]: never };
+    Enums: { [_ in never]: never };
+    CompositeTypes: { [_ in never]: never };
   };
 };
