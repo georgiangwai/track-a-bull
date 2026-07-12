@@ -97,13 +97,13 @@ drop policy if exists "Menu entries are publicly readable" on menu_entries;
 create policy "Menu entries are publicly readable" on menu_entries
   for select using (true);
 
--- The app inserts menu items when a user logs a meal.
+-- The app inserts menu items when a user logs a meal. It never updates
+-- existing rows (upsert uses ignoreDuplicates), so there is deliberately
+-- no update policy: signed-in users can't rewrite shared nutrition data.
 drop policy if exists "Signed-in users can add menu items" on menu_items;
 create policy "Signed-in users can add menu items" on menu_items
   for insert to authenticated with check (true);
 drop policy if exists "Signed-in users can update menu items" on menu_items;
-create policy "Signed-in users can update menu items" on menu_items
-  for update to authenticated using (true);
 
 drop policy if exists "Profiles are viewable by owner" on profiles;
 create policy "Profiles are viewable by owner" on profiles
